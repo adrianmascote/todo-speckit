@@ -1,6 +1,6 @@
 # Data Model Reference
 
-**Status:** Feature 1 — users, sessions, and list ownership rows for authenticated `GET /todo/lists`.
+**Status:** Feature 2 — users, sessions, and owned lists (CRUD).
 
 ## Tables
 
@@ -31,12 +31,10 @@
 | Field | Type | Rules |
 |-------|------|-------|
 | `id` | INTEGER PK | Auto-increment |
-| `name` | STRING | Required |
-| `userId` | INTEGER FK | Required; references `users.id` |
+| `name` | STRING(100) | Required; trimmed; max 100 chars |
+| `userId` | INTEGER FK | Required; references `users.id`; set from `req.user.id` on create; never changes |
 | `createdAt` | DATE | Sequelize timestamp |
 | `updatedAt` | DATE | Sequelize timestamp |
-
-List **create/update/delete** is Feature 2. Feature 1 persists this table so authenticated `GET /todo/lists` can prove per-user scoping.
 
 ## Associations
 
@@ -50,4 +48,4 @@ List **create/update/delete** is Feature 2. Feature 1 persists this table so aut
 | Area | Introduced |
 |------|------------|
 | `users`, `sessions` | Feature 1 |
-| `lists` table + `userId` FK | Feature 1 (read path); Feature 2 owns CRUD |
+| `lists` table + `userId` FK | Feature 1 (read path); Feature 2 owns CRUD and `name` max length |

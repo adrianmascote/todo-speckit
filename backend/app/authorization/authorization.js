@@ -34,3 +34,10 @@ export const authenticate = async (req, res, next) => {
     return res.status(401).send({ message: "Unauthorized!" });
   }
 };
+
+export const getAccessibleListOrNull = async (req, listId) => {
+  const row = await db.list.findOne({
+    where: { id: listId, userId: req.user.id },
+  });
+  return row ?? null;
+};

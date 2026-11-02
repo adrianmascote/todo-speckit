@@ -29,5 +29,6 @@ They do **not** authorize new scope — implement only from `features/feature-*.
 
 | Area | Introduced |
 |------|------------|
-| Auth API, users/sessions, SPA login/register/home | Feature 1 |
+| Auth API, users/sessions, SPA login/register | Feature 1 |
 | Scoped `GET /todo/lists` | Feature 1 |
+| List CRUD, `Dashboard.vue` lists view, `MenuBar` | Feature 2 |
