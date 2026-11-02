@@ -1,6 +1,6 @@
 # API Reference
 
-**Status:** Feature 4 — auth, lists, todos, and self-service profile.
+**Status:** Feature 5 — auth, lists, todos with optional `dueDate`, and self-service profile.
 
 Base path: `/todo/`. Authenticated routes require `Authorization: Bearer <token>`.
 
@@ -18,7 +18,7 @@ Base path: `/todo/`. Authenticated routes require `Authorization: Bearer <token>
 | `DELETE` | `/todo/lists/:listId` | Yes | Delete an owned list (todos in the list are removed) |
 | `GET` | `/todo/lists/:listId/todos` | Yes | Return todos in an owned list (incomplete first, then `createdAt` ASC) |
 | `POST` | `/todo/lists/:listId/todos` | Yes | Add a todo to an owned list |
-| `PUT` | `/todo/todos/:id` | Yes | Update an owned todo (`title` and/or `completed`) |
+| `PUT` | `/todo/todos/:id` | Yes | Update an owned todo (`title`, `completed`, and/or `dueDate`) |
 | `DELETE` | `/todo/todos/:id` | Yes | Delete an owned todo |
 | `GET` | `/todo/users/:id` | Yes | Fetch the authenticated user's profile (`:id` must be `req.user.id`) |
 | `PUT` | `/todo/users/:id` | Yes | Update the authenticated user's profile |
@@ -67,13 +67,18 @@ Password hashes are never returned.
   "listId": 1,
   "title": "Buy milk",
   "completed": false,
+  "dueDate": "2026-07-15",
   "userId": 42,
   "createdAt": "2026-07-02T12:05:00.000Z",
   "updatedAt": "2026-07-02T12:05:00.000Z"
 }
 ```
 
-**Create body:** `{ "title": "Buy milk" }`. `userId` and `listId` in the body are ignored; ownership is the session user and `:listId` after an ownership check. New todos default to `completed: false`.
+`dueDate` is `null` when not set. API values are calendar-only `YYYY-MM-DD`.
+
+**Create body:** `{ "title": "Buy milk", "dueDate": "2026-07-15" }`. `dueDate` is optional; omit it or send `null` for no due date. `userId` and `listId` in the body are ignored; ownership is the session user and `:listId` after an ownership check. New todos default to `completed: false`.
+
+**Update body:** any combination of `{ "title", "completed", "dueDate" }`. `dueDate: null` clears the date; omitting `dueDate` leaves the stored value unchanged.
 
 ## Profile success payload
 
@@ -112,6 +117,7 @@ Password hashes are never returned.
 | List not found or not owned | `404` | `List with id=<id> not found.` |
 | Empty or whitespace-only todo title | `400` | `Todo title is required.` |
 | Todo title longer than 255 characters | `400` | `Todo title must be 255 characters or fewer.` |
+| Invalid `dueDate` | `400` | `Due date must be a valid date in YYYY-MM-DD format.` |
 | Invalid todo `id` | `400` | `Todo id is invalid.` |
 | Todo not found or not owned | `404` | `Todo with id=<id> not found.` |
 | User not found or not self | `404` | `User with id=<id> not found.` |
@@ -126,3 +132,4 @@ Password hashes are never returned.
 | `POST` / `PUT` / `DELETE /todo/lists` | Feature 2 |
 | Todo items nested under lists | Feature 3 |
 | Self-service `GET` / `PUT /todo/users/:id` | Feature 4 |
+| Optional `dueDate` on todo create/update/read | Feature 5 |

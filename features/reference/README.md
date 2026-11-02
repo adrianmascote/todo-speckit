@@ -1,6 +1,6 @@
 # Reference Specifications
 
-**Living snapshot** of the integrated product on `dev` after merged features.
+**Living snapshot** of the integrated product on `dev` after merged features (through Feature 5).
 
 These files answer: *"What does the app look like right now?"*  
 They do **not** authorize new scope — implement only from `features/feature-*.md`.
@@ -34,3 +34,4 @@ They do **not** authorize new scope — implement only from `features/feature-*.
 | List CRUD, `Dashboard.vue` lists view, `MenuBar` | Feature 2 |
 | Todo items, list-items dialog, cascade delete | Feature 3 |
 | Profile dropdown, Edit Profile, self-only user API | Feature 4 |
+| Optional todo `dueDate`, list-row display, overdue styling | Feature 5 |

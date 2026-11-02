@@ -27,11 +27,43 @@ const todosLoading = ref(false);
 const todoErrorMessage = ref("");
 const selectedTodo = ref(null);
 const newTodoTitle = ref("");
+const newTodoDueDate = ref("");
 const editTodoTitle = ref("");
+const editTodoDueDate = ref("");
 const savingTodo = ref(false);
 
 const listNameRules = [(value) => !!value?.trim() || "List name is required."];
 const todoTitleRules = [(value) => !!value?.trim() || "Todo title is required."];
+const dueDateRules = [
+  (value) =>
+    !value ||
+    /^\d{4}-\d{2}-\d{2}$/.test(value) ||
+    "Due date must be a valid date in YYYY-MM-DD format.",
+];
+
+function parseLocalDate(isoDate) {
+  const [year, month, day] = isoDate.split("-").map(Number);
+  return new Date(year, month - 1, day);
+}
+
+function formatDueDate(isoDate) {
+  return parseLocalDate(isoDate).toLocaleDateString("en-US", {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+  });
+}
+
+function isOverdue(todo) {
+  if (!todo.dueDate || todo.completed) {
+    return false;
+  }
+  const due = parseLocalDate(todo.dueDate);
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  due.setHours(0, 0, 0, 0);
+  return due < today;
+}
 
 function apiErrorMessage(error, fallback) {
   return error.response?.data?.message || fallback;
@@ -157,12 +189,14 @@ function closeItemsDialog() {
 
 function openAddItemDialog() {
   newTodoTitle.value = "";
+  newTodoDueDate.value = "";
   addItemDialog.value = true;
 }
 
 function openEditTodoDialog(todo) {
   selectedTodo.value = todo;
   editTodoTitle.value = todo.title;
+  editTodoDueDate.value = todo.dueDate || "";
   editItemDialog.value = true;
 }
 
@@ -180,11 +214,14 @@ async function createTodo() {
 
   savingTodo.value = true;
   try {
-    await TodoServices.createTodo(selectedList.value.id, {
-      title: newTodoTitle.value.trim(),
-    });
+    const payload = { title: newTodoTitle.value.trim() };
+    if (newTodoDueDate.value) {
+      payload.dueDate = newTodoDueDate.value;
+    }
+    await TodoServices.createTodo(selectedList.value.id, payload);
     addItemDialog.value = false;
     newTodoTitle.value = "";
+    newTodoDueDate.value = "";
     await loadTodos();
   } catch (error) {
     todoErrorMessage.value = apiErrorMessage(error, "Unable to create todo.");
@@ -204,6 +241,7 @@ async function saveTodo() {
   try {
     await TodoServices.updateTodo(selectedTodo.value.id, {
       title: editTodoTitle.value.trim(),
+      dueDate: editTodoDueDate.value ? editTodoDueDate.value : null,
     });
     editItemDialog.value = false;
     await loadTodos();
@@ -416,6 +454,14 @@ onMounted(loadLists);
                   {{ todo.title }}
                 </span>
               </template>
+              <template v-if="todo.dueDate" #subtitle>
+                <span
+                  class="todo-due-date"
+                  :class="isOverdue(todo) ? 'text-error' : ''"
+                >
+                  {{ formatDueDate(todo.dueDate) }}
+                </span>
+              </template>
               <template #append>
                 <v-btn
                   icon="mdi-pencil"
@@ -452,6 +498,12 @@ onMounted(loadLists);
               label="Todo title"
               :rules="todoTitleRules"
             />
+            <v-text-field
+              v-model="newTodoDueDate"
+              type="date"
+              label="Due date"
+              :rules="dueDateRules"
+            />
           </v-form>
         </v-card-text>
         <v-card-actions>
@@ -479,6 +531,12 @@ onMounted(loadLists);
               v-model="editTodoTitle"
               label="Todo title"
               :rules="todoTitleRules"
+            />
+            <v-text-field
+              v-model="editTodoDueDate"
+              type="date"
+              label="Due date"
+              :rules="dueDateRules"
             />
           </v-form>
         </v-card-text>

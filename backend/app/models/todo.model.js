@@ -17,6 +17,20 @@ export default (sequelize, Sequelize) => {
       type: Sequelize.INTEGER,
       allowNull: false,
     },
+    dueDate: {
+      type: Sequelize.DATEONLY,
+      allowNull: true,
+      get() {
+        const value = this.getDataValue("dueDate");
+        if (!value) {
+          return null;
+        }
+        if (typeof value === "string") {
+          return value.slice(0, 10);
+        }
+        return value.toISOString().slice(0, 10);
+      },
+    },
   });
 
   return Todo;

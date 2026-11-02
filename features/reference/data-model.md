@@ -1,6 +1,6 @@
 # Data Model Reference
 
-**Status:** Feature 4 — users (self-service profile), sessions, owned lists, and todo items.
+**Status:** Feature 5 — users, sessions, owned lists, and todos with optional `dueDate`.
 
 ## Tables
 
@@ -44,6 +44,7 @@
 | `listId` | INTEGER FK | Required; references `lists.id`; removed when the parent list is deleted |
 | `title` | STRING(255) | Required; trimmed; max 255 chars |
 | `completed` | BOOLEAN | Default `false` |
+| `dueDate` | DATEONLY | Nullable; optional on create/update; calendar date `YYYY-MM-DD`; `null` means no due date |
 | `userId` | INTEGER FK | Required; references `users.id`; set from `req.user.id` on create; never taken from the client body |
 | `createdAt` | DATE | Sequelize timestamp |
 | `updatedAt` | DATE | Sequelize timestamp |
@@ -67,3 +68,4 @@
 | `lists` table + `userId` FK | Feature 1 (read path); Feature 2 owns CRUD and `name` max length |
 | `todos` table + list/user FKs | Feature 3 |
 | Profile field edit via existing `users` row | Feature 4 |
+| `todos.dueDate` | Feature 5 |

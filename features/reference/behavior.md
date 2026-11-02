@@ -1,6 +1,6 @@
 # Behavior & Rules Reference
 
-**Living snapshot** of product rules currently in force (Feature 4).
+**Living snapshot** of product rules currently in force (Feature 5).
 
 | Rule | Enforcement | Introduced |
 |------|-------------|------------|
@@ -46,6 +46,10 @@
 | After profile save, `localStorage` `user` is refreshed and `user-logged-in` dispatched | `MenuBar.vue` | Feature 4 |
 | Menu bar uses a profile icon dropdown (name, username, email, **Edit Profile**, **Log out**) | `MenuBar.vue` | Feature 4 |
 | Standalone menu-bar **Sign out** is removed; logout is **Log out** in the dropdown | `MenuBar.vue` | Feature 4 |
+| `dueDate` is optional; `null` means no due date; API is `YYYY-MM-DD` | Todo controller + Dashboard | Feature 5 |
+| Invalid `dueDate` → `400` (**"Due date must be a valid date in YYYY-MM-DD format."**) | Todo controller | Feature 5 |
+| `PUT` with `dueDate: null` clears; omitting `dueDate` leaves the stored value | Todo `update` | Feature 5 |
+| Incomplete todos with `dueDate` before today (local calendar) use overdue styling; completed do not | Dashboard items dialog | Feature 5 |
 
 These files answer: *"What rules does the app enforce right now?"*  
 They do **not** authorize new scope — implement only from `features/feature-*.md`.
