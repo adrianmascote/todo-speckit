@@ -1,6 +1,6 @@
 # Behavior & Rules Reference
 
-**Living snapshot** of product rules currently in force (Feature 3).
+**Living snapshot** of product rules currently in force (Feature 4).
 
 | Rule | Enforcement | Introduced |
 |------|-------------|------------|
@@ -27,7 +27,7 @@
 | Empty lists copy: **"No lists yet. Create your first list."** | Dashboard | Feature 2 |
 | Primary list CTAs use class `oc-cta` (`+ New List`, **Create**, **Save**) | Dashboard | Feature 2 |
 | Row actions are icon-only, `size="small"`, aria-labels **Edit list** / **Delete list** | Dashboard | Feature 2 |
-| `MenuBar` shows signed-in name and **Sign out**; hidden on login and register | `MenuBar.vue` | Feature 2 |
+| `MenuBar` is hidden on login and register | `MenuBar.vue` | Feature 2 |
 | Todo create requires owned parent list; else `404` | `getAccessibleListOrNull` | Feature 3 |
 | Todo read/update/delete scoped with `id` + `userId`; unowned → `404` | `getAccessibleTodoOrNull` | Feature 3 |
 | Todo titles trimmed; empty/whitespace rejected (**"Todo title is required."**) | Todo controller + Dashboard | Feature 3 |
@@ -39,6 +39,13 @@
 | Empty todos copy: **"No todos in this list yet."** | Items dialog | Feature 3 |
 | Completed todos use struck-through / muted title styling | Items dialog | Feature 3 |
 | **+ Add Item** is only inside the items dialog | Dashboard | Feature 3 |
+| Profile read/update is self-only (`:id === req.user.id`); else `404` | `getAccessibleUserOrNull` | Feature 4 |
+| Profile fields trimmed; username `trim().toLowerCase()`; empty required → `400` | User controller | Feature 4 |
+| Password on `PUT` is optional; when set, min 8 chars and bcrypt hashed | User controller | Feature 4 |
+| Profile responses never include the password hash; `role` is read-only | User controller | Feature 4 |
+| After profile save, `localStorage` `user` is refreshed and `user-logged-in` dispatched | `MenuBar.vue` | Feature 4 |
+| Menu bar uses a profile icon dropdown (name, username, email, **Edit Profile**, **Log out**) | `MenuBar.vue` | Feature 4 |
+| Standalone menu-bar **Sign out** is removed; logout is **Log out** in the dropdown | `MenuBar.vue` | Feature 4 |
 
 These files answer: *"What rules does the app enforce right now?"*  
 They do **not** authorize new scope — implement only from `features/feature-*.md`.

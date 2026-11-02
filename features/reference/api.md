@@ -1,6 +1,6 @@
 # API Reference
 
-**Status:** Feature 3 — auth, list CRUD, and todo items nested under lists.
+**Status:** Feature 4 — auth, lists, todos, and self-service profile.
 
 Base path: `/todo/`. Authenticated routes require `Authorization: Bearer <token>`.
 
@@ -20,6 +20,8 @@ Base path: `/todo/`. Authenticated routes require `Authorization: Bearer <token>
 | `POST` | `/todo/lists/:listId/todos` | Yes | Add a todo to an owned list |
 | `PUT` | `/todo/todos/:id` | Yes | Update an owned todo (`title` and/or `completed`) |
 | `DELETE` | `/todo/todos/:id` | Yes | Delete an owned todo |
+| `GET` | `/todo/users/:id` | Yes | Fetch the authenticated user's profile (`:id` must be `req.user.id`) |
+| `PUT` | `/todo/users/:id` | Yes | Update the authenticated user's profile |
 
 ## Auth success payload
 
@@ -73,6 +75,25 @@ Password hashes are never returned.
 
 **Create body:** `{ "title": "Buy milk" }`. `userId` and `listId` in the body are ignored; ownership is the session user and `:listId` after an ownership check. New todos default to `completed: false`.
 
+## Profile success payload
+
+`GET /todo/users/:id` and `PUT /todo/users/:id` → `200`. Password hashes are never returned. `role` is read-only.
+
+```json
+{
+  "id": 42,
+  "fName": "Jane",
+  "lName": "Doe",
+  "email": "jane@example.com",
+  "username": "jdoe",
+  "role": "worker",
+  "createdAt": "2026-07-02T12:00:00.000Z",
+  "updatedAt": "2026-07-02T12:05:00.000Z"
+}
+```
+
+**Update body:** `{ "fName", "lName", "email", "username", "password?" }`. Username is stored `trim().toLowerCase()`. Omit `password` to leave the current hash unchanged. Cross-user `:id` → `404`.
+
 ## Errors
 
 `{ "message": "Human-readable explanation." }`
@@ -93,6 +114,8 @@ Password hashes are never returned.
 | Todo title longer than 255 characters | `400` | `Todo title must be 255 characters or fewer.` |
 | Invalid todo `id` | `400` | `Todo id is invalid.` |
 | Todo not found or not owned | `404` | `Todo with id=<id> not found.` |
+| User not found or not self | `404` | `User with id=<id> not found.` |
+| Missing profile first name | `400` | `First name is required.` |
 
 ## Feature provenance
 
@@ -102,3 +125,4 @@ Password hashes are never returned.
 | `GET /todo/lists` (read, scoped) | Feature 1 |
 | `POST` / `PUT` / `DELETE /todo/lists` | Feature 2 |
 | Todo items nested under lists | Feature 3 |
+| Self-service `GET` / `PUT /todo/users/:id` | Feature 4 |

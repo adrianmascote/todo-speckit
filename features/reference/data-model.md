@@ -1,6 +1,6 @@
 # Data Model Reference
 
-**Status:** Feature 3 — users, sessions, owned lists, and todo items.
+**Status:** Feature 4 — users (self-service profile), sessions, owned lists, and todo items.
 
 ## Tables
 
@@ -9,12 +9,12 @@
 | Field | Type | Rules |
 |-------|------|-------|
 | `id` | INTEGER PK | Auto-increment |
-| `fName` | STRING | Required |
-| `lName` | STRING | Required |
-| `email` | STRING | Required, unique |
-| `username` | STRING(100) | Required, unique; stored lowercase |
-| `password` | STRING(255) | Required; bcrypt hash only; excluded from default scope |
-| `role` | STRING(20) | Default `worker` |
+| `fName` | STRING | Required; editable via `PUT /todo/users/:id` |
+| `lName` | STRING | Required; editable via `PUT /todo/users/:id` |
+| `email` | STRING | Required, unique; editable via `PUT /todo/users/:id` |
+| `username` | STRING(100) | Required, unique; stored lowercase; editable via `PUT /todo/users/:id` |
+| `password` | STRING(255) | Required; bcrypt hash only; excluded from default scope; optional on profile update |
+| `role` | STRING(20) | Default `worker`; read-only on profile API |
 
 ### `sessions`
 
@@ -66,3 +66,4 @@
 | `users`, `sessions` | Feature 1 |
 | `lists` table + `userId` FK | Feature 1 (read path); Feature 2 owns CRUD and `name` max length |
 | `todos` table + list/user FKs | Feature 3 |
+| Profile field edit via existing `users` row | Feature 4 |
