@@ -1,6 +1,6 @@
 # Data Model Reference
 
-**Status:** Feature 2 — users, sessions, and owned lists (CRUD).
+**Status:** Feature 3 — users, sessions, owned lists, and todo items.
 
 ## Tables
 
@@ -36,12 +36,28 @@
 | `createdAt` | DATE | Sequelize timestamp |
 | `updatedAt` | DATE | Sequelize timestamp |
 
+### `todos`
+
+| Field | Type | Rules |
+|-------|------|-------|
+| `id` | INTEGER PK | Auto-increment |
+| `listId` | INTEGER FK | Required; references `lists.id`; removed when the parent list is deleted |
+| `title` | STRING(255) | Required; trimmed; max 255 chars |
+| `completed` | BOOLEAN | Default `false` |
+| `userId` | INTEGER FK | Required; references `users.id`; set from `req.user.id` on create; never taken from the client body |
+| `createdAt` | DATE | Sequelize timestamp |
+| `updatedAt` | DATE | Sequelize timestamp |
+
 ## Associations
 
 - `User hasMany Session` (`foreignKey: userId`)
 - `Session belongsTo User`
 - `User hasMany List` (`foreignKey: userId`)
 - `List belongsTo User`
+- `User hasMany Todo` (`foreignKey: userId`)
+- `Todo belongsTo User`
+- `List hasMany Todo` (`foreignKey: listId`, `onDelete: CASCADE`)
+- `Todo belongsTo List`
 
 ## Feature provenance
 
@@ -49,3 +65,4 @@
 |------|------------|
 | `users`, `sessions` | Feature 1 |
 | `lists` table + `userId` FK | Feature 1 (read path); Feature 2 owns CRUD and `name` max length |
+| `todos` table + list/user FKs | Feature 3 |

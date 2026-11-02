@@ -8,6 +8,7 @@ export const syncTestDatabase = async () => {
 
 export const clearAuthData = async () => {
   await db.session.destroy({ where: {} });
+  await db.todo.destroy({ where: {} });
   await db.list.destroy({ where: {} });
   await db.user.destroy({ where: {} });
 };

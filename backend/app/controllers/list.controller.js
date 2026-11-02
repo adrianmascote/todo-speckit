@@ -96,6 +96,7 @@ exports.delete = async (req, res) => {
       return res.status(404).send(listNotFoundMessage(listId));
     }
 
+    await db.todo.destroy({ where: { listId: list.id, userId: req.user.id } });
     await list.destroy();
     return res.status(200).send(list);
   } catch (error) {

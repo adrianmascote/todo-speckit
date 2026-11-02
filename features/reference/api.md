@@ -1,6 +1,6 @@
 # API Reference
 
-**Status:** Feature 2 — auth API plus authenticated list CRUD.
+**Status:** Feature 3 — auth, list CRUD, and todo items nested under lists.
 
 Base path: `/todo/`. Authenticated routes require `Authorization: Bearer <token>`.
 
@@ -15,7 +15,11 @@ Base path: `/todo/`. Authenticated routes require `Authorization: Bearer <token>
 | `GET` | `/todo/lists` | Yes | Return lists owned by `req.user.id`, ordered by name |
 | `POST` | `/todo/lists` | Yes | Create a list owned by `req.user.id` |
 | `PUT` | `/todo/lists/:listId` | Yes | Rename an owned list |
-| `DELETE` | `/todo/lists/:listId` | Yes | Delete an owned list |
+| `DELETE` | `/todo/lists/:listId` | Yes | Delete an owned list (todos in the list are removed) |
+| `GET` | `/todo/lists/:listId/todos` | Yes | Return todos in an owned list (incomplete first, then `createdAt` ASC) |
+| `POST` | `/todo/lists/:listId/todos` | Yes | Add a todo to an owned list |
+| `PUT` | `/todo/todos/:id` | Yes | Update an owned todo (`title` and/or `completed`) |
+| `DELETE` | `/todo/todos/:id` | Yes | Delete an owned todo |
 
 ## Auth success payload
 
@@ -51,6 +55,24 @@ Password hashes are never returned.
 
 **Create / rename body:** `{ "name": "Groceries" }`. Any `userId` in the body is ignored; ownership is always `req.user.id`.
 
+## Todo success payload
+
+`POST /todo/lists/:listId/todos` → `201`; `PUT /todo/todos/:id` → `200`; `GET /todo/lists/:listId/todos` → `200` (array). `DELETE` → `200` with the deleted todo object.
+
+```json
+{
+  "id": 10,
+  "listId": 1,
+  "title": "Buy milk",
+  "completed": false,
+  "userId": 42,
+  "createdAt": "2026-07-02T12:05:00.000Z",
+  "updatedAt": "2026-07-02T12:05:00.000Z"
+}
+```
+
+**Create body:** `{ "title": "Buy milk" }`. `userId` and `listId` in the body are ignored; ownership is the session user and `:listId` after an ownership check. New todos default to `completed: false`.
+
 ## Errors
 
 `{ "message": "Human-readable explanation." }`
@@ -67,6 +89,10 @@ Password hashes are never returned.
 | List name longer than 100 characters | `400` | `List name must be 100 characters or fewer.` |
 | Invalid `listId` | `400` | `List id is invalid.` |
 | List not found or not owned | `404` | `List with id=<id> not found.` |
+| Empty or whitespace-only todo title | `400` | `Todo title is required.` |
+| Todo title longer than 255 characters | `400` | `Todo title must be 255 characters or fewer.` |
+| Invalid todo `id` | `400` | `Todo id is invalid.` |
+| Todo not found or not owned | `404` | `Todo with id=<id> not found.` |
 
 ## Feature provenance
 
@@ -75,3 +101,4 @@ Password hashes are never returned.
 | Register, login, logout | Feature 1 |
 | `GET /todo/lists` (read, scoped) | Feature 1 |
 | `POST` / `PUT` / `DELETE /todo/lists` | Feature 2 |
+| Todo items nested under lists | Feature 3 |

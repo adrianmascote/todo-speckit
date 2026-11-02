@@ -32,3 +32,4 @@ They do **not** authorize new scope — implement only from `features/feature-*.
 | Auth API, users/sessions, SPA login/register | Feature 1 |
 | Scoped `GET /todo/lists` | Feature 1 |
 | List CRUD, `Dashboard.vue` lists view, `MenuBar` | Feature 2 |
+| Todo items, list-items dialog, cascade delete | Feature 3 |
